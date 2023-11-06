@@ -5,6 +5,7 @@ import { appConfig } from './config/app-config';
 import { loggingMiddleware } from './middlewares/logging-middleware';
 import { authenticationMiddleware } from './middlewares/auth-middleware';
 import { errorMiddleware } from './middlewares/exception-handler-middleware';
+import appLogger from './utilities/logger';
 
 const app: Application = express();
 
@@ -22,5 +23,5 @@ app.use ( errorMiddleware );
 
 //Start Working on things
 app.listen(appConfig.port, () => {
-  console.log(`[${new Date().toISOString()}] ${appConfig.appName} is running on port ${appConfig.port}`);
+  appLogger.info(`${appConfig.appName} is running on port ${appConfig.port}`);
 });

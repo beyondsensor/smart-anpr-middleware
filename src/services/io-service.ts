@@ -1,7 +1,7 @@
 import { mqttConfig } from "../config/app-config";
 import { IOTriggerRequest } from "../types/io-types" 
 import { ConnectionParams, MyMqttClient, makeMqttClient } from "../utilities/mqtt";
-
+import appLogger from "../utilities/logger";
 const connectionParams : ConnectionParams = {
     mqttHost: mqttConfig.mqServerHost,
     mqttUser: mqttConfig.mqUser,
@@ -10,27 +10,26 @@ const connectionParams : ConnectionParams = {
     topic: mqttConfig.topic,
 
     onConnect: function (): void {
-        console.log ( "Connection established")
+        appLogger.info ( "Connection established");
+
     },
     onMessage: function (topic: string, message: Buffer): void {
         try { 
             const start = Date.now();
-            console.log ( `Received Message from the following topic : ${topic}`)
             const results = message.toString();
             const object = JSON.parse ( results );
             const end = Date.now();
-            console.log ( "Message Received", topic, object );
-            console.log ( `Time taken : [${end - start } ms]`)
-        } catch ( error ) { 
-            console.log ( error )
+            /// Process The Message from here 
+            appLogger.info ( `Received Message for Topic : ${topic} [${results.length} bytes] [Time taken : ${end - start} ms]`)
+        } catch ( error : any) { 
+            appLogger.error ( ` Unable to process message : ${error.message}`)
         }
     },
     onError: function (error: any): void {
-        console.log ( "Connection error");
-        //console.log ( "Error ", error )
+        appLogger.error ( `Lost connection with MQ Server`)
     },
     onClose: function (): void {
-        console.log ( "Connection Closed");
+        appLogger.error ( `Lost connection with MQ Server`)
     }
 }
 const client : MyMqttClient = makeMqttClient ( connectionParams );

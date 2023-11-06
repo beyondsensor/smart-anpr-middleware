@@ -1,5 +1,7 @@
 import { VehicleEnterEvent, VehicleLeaveEvent, VehicleTracker } from "../types/vehicle-tracker-types";
 import { trackerConfig } from "../config/app-config";
+import appLogger from "../utilities/logger";
+import { json } from "express";
 /// Tracking Object for Trackers 
 const trackers: Map<string, VehicleTracker> = new Map<string, VehicleTracker>();
 
@@ -15,7 +17,7 @@ export const vehicleTrackingService = {
  */
 function onVehicleEnter(ev: VehicleEnterEvent) {
     if (trackers.has(ev.anpr)) {
-        console.log(`[ ${new Date().toISOString()}] [${ev.anpr}] Vehicle already tracked`);
+        appLogger.info(`[${ev.anpr}] Vehicle already tracked`);
     } else {
         // 1. Create a Tracker Instance and Start Managing It 
         const tracker = makeVehicleTracker(ev);
@@ -28,7 +30,7 @@ function onVehicleEnter(ev: VehicleEnterEvent) {
  * @param ev 
  */
 function onVehicleExit(ev: VehicleLeaveEvent) {
-    console.log(`[ ${new Date().toISOString()}] [${ev.anpr}] Vehicle Left Area Event Received`);
+    appLogger.info(`[${ev.anpr}] Vehicle Left Area Event Received`);
     removeTracker(ev.anpr);
 }
 
@@ -37,7 +39,7 @@ function onVehicleExit(ev: VehicleLeaveEvent) {
  * @param anpr 
  */
 function removeTracker(anpr: string) {
-    console.log(`[${new Date().toISOString()}] [${anpr}] Removed from Vehicle Tracker`);
+    appLogger.info(`[${anpr}] Removed from Vehicle Tracker`);
     const t = trackers.get(anpr);
     t?.stop();
     trackers.delete(anpr);
@@ -50,13 +52,13 @@ function removeTracker(anpr: string) {
  */
 function makeVehicleTracker(ev: VehicleEnterEvent): VehicleTracker {
 
-    console.log(`[${new Date().toISOString()}] [${ev.anpr}] Vehicle Tracking Started for Vehicle`);
-    console.log ( trackerConfig );
+    appLogger.info(`[${ev.anpr}] Vehicle Tracking Started for Vehicle`);
+    appLogger.debug(`${JSON.stringify(trackerConfig)}`);
 
     /// When Triggered, a warning Message is sent  
     const warningTimeout = setTimeout(() => {
         // If the Timeout is reached, start Tracking the Subject 
-        console.log(`[${new Date().toISOString()}] [${ev.anpr}] Vehicle Warning Triggered `);
+        appLogger.info(`[${ev.anpr}] Vehicle Tracking Started for Vehicle`);
         const warning = {
             warningInSeconds: trackerConfig.triggerTime,
             ev: ev
@@ -66,7 +68,7 @@ function makeVehicleTracker(ev: VehicleEnterEvent): VehicleTracker {
     }, trackerConfig.warningTime);
     /// When Triggered, it means that the Object is automatically deleted 
     const triggerTimeout = setTimeout(() => {
-        console.log(`[${new Date().toISOString()}] [${ev.anpr}] Vehicle Recorded for Illegal Parking`);
+        appLogger.info(`[${ev.anpr}] Vehicle Recorded for Illegal Parking`);
         removeTracker(ev.anpr);
         /// TODO : Send to Backend if the Vehicle stays Beyond This 
         /// TODO : Send a Message to Stop the Warning Trigger 
@@ -74,7 +76,7 @@ function makeVehicleTracker(ev: VehicleEnterEvent): VehicleTracker {
 
     /// Stop the Trigger Altogether 
     function stopTracker() {
-        console.log(`[${new Date().toISOString()}] [${ev.anpr}] Tracker Stopped`);
+        appLogger.info(`[${ev.anpr}] Tracker Stopped`);
         clearTimeout(warningTimeout);
         clearTimeout(triggerTimeout);
     }

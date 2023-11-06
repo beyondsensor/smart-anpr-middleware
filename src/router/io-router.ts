@@ -2,6 +2,7 @@ import { mqttConfig } from "../config/app-config";
 import express, { Request, Response } from "express"
 const ioRouter = express.Router();
 import * as ioService from "../services/io-service";
+import appLogger from "../utilities/logger";
 
 ioRouter.get ( "/config", async ( req : Request, res : Response ) => { 
     res.send ({
@@ -26,7 +27,7 @@ ioRouter.post ( "/trigger", async ( req : Request, res : Response ) => {
 
 ioRouter.post ( "/debugging/send-mq", async ( req : Request, res : Response ) => { 
     const body = req.body; 
-    console.log ( body )
+    appLogger.debug ( JSON.stringify(body) );
     const results = await ioService.sendMessage ( JSON.stringify(body) );
     res.send ( {
         message : "Success"

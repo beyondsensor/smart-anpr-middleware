@@ -1,5 +1,5 @@
 import * as mqtt from 'mqtt'; // Import the MQTT library
-
+import appLogger from './logger';
 type OnConnectCallback = ( ) => void;
 type OnCloseCallback = ( ) => void;
 type OnMessageCallback = ( topic: string, message : Buffer ) => void;
@@ -41,8 +41,8 @@ export function makeMqttClient ( connection : ConnectionParams ) : MyMqttClient 
     return { 
         client : client,
         sendMessage: ( message : string ) => { 
-            console.log ( "Sending Message via Client", client);
-            console.log ( "Topic", connection.topic, message)
+            appLogger.info ( "Sending Message via Client");
+            appLogger.info ( `Sending Message to Topic : ${message}`);
             client.publish( connection.topic, message );
             return { 
                 success: true

@@ -41,3 +41,13 @@ export const trackerConfig = {
     warningTime : 30000, 
     triggerTime : 60000
 }
+
+export const loggingConfig = { 
+    maxSize: "10MB", 
+    maxFiles: 5, 
+    level : "info", 
+    filePath : "/logs",
+    zippedArchive: false,
+    fileName : "middleware-service_%DATE%.log", 
+    dateFormat: "YYYY-MM-DDTHH:mm:ss"
+}
