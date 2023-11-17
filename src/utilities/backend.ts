@@ -1,1 +1,1 @@
-import { backendApiConfig } from "../config/app-config";
+import { backendConfig } from "../config/app-config";

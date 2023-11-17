@@ -1,6 +1,7 @@
 import { VehicleEnterEvent, VehicleLeaveEvent, VehicleTracker } from "../types/vehicle-tracker-types";
 import { trackerConfig } from "../config/app-config";
 import appLogger from "../utilities/logger";
+import { ioService } from "./io-service";
 import { json } from "express";
 /// Tracking Object for Trackers 
 const trackers: Map<string, VehicleTracker> = new Map<string, VehicleTracker>();
@@ -63,6 +64,7 @@ function makeVehicleTracker(ev: VehicleEnterEvent): VehicleTracker {
             warningInSeconds: trackerConfig.triggerTime,
             ev: ev
         }
+        ioService.triggerAll ( true );
         /// TODO : Send Warning to MQ Server for Triggers 
         /// TODO : Trigger Alarm via MQ Controller 
     }, trackerConfig.warningTime);
@@ -70,6 +72,7 @@ function makeVehicleTracker(ev: VehicleEnterEvent): VehicleTracker {
     const triggerTimeout = setTimeout(() => {
         appLogger.info(`[${ev.anpr}] Vehicle Recorded for Illegal Parking`);
         removeTracker(ev.anpr);
+        ioService.triggerAll ( false);
         /// TODO : Send to Backend if the Vehicle stays Beyond This 
         /// TODO : Send a Message to Stop the Warning Trigger 
     },  trackerConfig.triggerTime);
@@ -79,6 +82,7 @@ function makeVehicleTracker(ev: VehicleEnterEvent): VehicleTracker {
         appLogger.info(`[${ev.anpr}] Tracker Stopped`);
         clearTimeout(warningTimeout);
         clearTimeout(triggerTimeout);
+        ioService.triggerAll ( false);
     }
 
     /// Return the Tracking Object 

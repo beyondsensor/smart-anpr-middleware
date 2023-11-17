@@ -8,8 +8,6 @@ export interface HikCameraConfig {
 
 export function makeAnprCameraListener ( config : HikCameraConfig ) { 
 
-
-
     const service = { 
 
         config : config,

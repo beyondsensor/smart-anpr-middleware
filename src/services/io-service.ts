@@ -1,60 +1,49 @@
-import { mqttConfig } from "../config/app-config";
-import { IOTriggerRequest } from "../types/io-types" 
-import { ConnectionParams, MyMqttClient, makeMqttClient } from "../utilities/mqtt";
-import appLogger from "../utilities/logger";
-const connectionParams : ConnectionParams = {
-    mqttHost: mqttConfig.mqServerHost,
-    mqttUser: mqttConfig.mqUser,
-    clientId: "middleware-001",
-    mqttPassword: mqttConfig.mqPassword,
-    topic: mqttConfig.topic,
+import { AdvantechDeviceSettings, AdvantechMqClient } from "../utilities/advantech/io-controller";
 
-    onConnect: function (): void {
-        appLogger.info ( "Connection established");
-
+/// Settings for the MQ Client 
+const deviceSettings : AdvantechDeviceSettings = {
+    id: 1,
+    name: "device_name",
+    mqConfigs: {
+        willTopic: "Advantech/74FE488684FD/Device_Status",
+        statusTopic: "Advantech/74FE488684FD/data",
+        triggerPrefix: "Advantech/74FE488684FD/ctl"
     },
-    onMessage: function (topic: string, message: Buffer): void {
-        try { 
-            const start = Date.now();
-            const results = message.toString();
-            const object = JSON.parse ( results );
-            const end = Date.now();
-            /// Process The Message from here 
-            appLogger.info ( `Received Message for Topic : ${topic} [${results.length} bytes] [Time taken : ${end - start} ms]`)
-        } catch ( error : any) { 
-            appLogger.error ( ` Unable to process message : ${error.message}`)
-        }
-    },
-    onError: function (error: any): void {
-        appLogger.error ( `Lost connection with MQ Server`)
-    },
-    onClose: function (): void {
-        appLogger.error ( `Lost connection with MQ Server`)
-    }
-}
-const client : MyMqttClient = makeMqttClient ( connectionParams );
+    dis: ["di1", "di2", "di3", "di4", "di5", "di6"],
+    dos: ["do1", "do2", "do3", "do4", "do5", "do6"],
+};
 
-export async function getStatus () { 
-    return { 
-        mqConnection : true
-    }
-}
+/// Client Manager 
+const client = new AdvantechMqClient ( deviceSettings );
 
-export async function sendMessage (  message : string ) { 
-    client.sendMessage ( message );
-    return { 
-        message : message
-    }
-}
-
-export async function triggerIOSignal ( { ioPort, bit } : IOTriggerRequest) { 
-    const message = JSON.stringify ( { 
-        bit: bit,
-        port: ioPort
+function triggerAll ( value : boolean ) { 
+    return deviceSettings.dos.map ( e => { 
+        return client.trigger ( e, value );
     })
-    client.sendMessage ( message );
-    return { 
-        success: true     
-    }
+}
+
+function trigger( doId : string, value : boolean ) { 
+    return client.trigger ( doId, value );
+}
+
+function getStatus () { 
+    return client.status;
+}
+
+function getState () { 
+    return client.state;
+}
+
+function getConfig () { 
+    return client.config;
+}
+
+
+export const ioService = { 
+    trigger, 
+    getStatus, 
+    getConfig, 
+    getState, 
+    triggerAll
 }
 

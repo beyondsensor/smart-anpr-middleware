@@ -10,7 +10,6 @@ export interface ConnectionParams {
     mqttUser : string; 
     clientId : string;
     mqttPassword : string; 
-    topic : string;
     onConnect : OnConnectCallback;
     onMessage : OnMessageCallback;
     onError : OnErrorCallback;
@@ -19,7 +18,8 @@ export interface ConnectionParams {
 
 export interface MyMqttClient { 
     client : mqtt.MqttClient;
-    sendMessage : ( message : string ) => void; 
+    sendMessage : ( topic : string, message : string ) => void; 
+    subscribeToTopic : ( topic : string ) => void;
 }
 
 export function makeMqttClient ( connection : ConnectionParams ) : MyMqttClient { 
@@ -30,7 +30,6 @@ export function makeMqttClient ( connection : ConnectionParams ) : MyMqttClient 
                                 username: connection.mqttUser, 
                                 password: connection.mqttPassword,
     });
-    client.subscribe ( connection.topic );
 
     // Handle connection events
     client.on('connect', connection.onConnect);
@@ -40,13 +39,16 @@ export function makeMqttClient ( connection : ConnectionParams ) : MyMqttClient 
 
     return { 
         client : client,
-        sendMessage: ( message : string ) => { 
+        sendMessage: ( topic: string, message : string ) => { 
             appLogger.info ( "Sending Message via Client");
             appLogger.info ( `Sending Message to Topic : ${message}`);
-            client.publish( connection.topic, message );
+            client.publish( topic, message );
             return { 
                 success: true
             }
+        },
+        subscribeToTopic: ( topic : string ) => { 
+            client.subscribe ( topic);
         }
     }
 }

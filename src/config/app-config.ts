@@ -1,12 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-function toArray ( value : string ) { 
-    return value.split ( ",")
-}
-
 export const appConfig = { 
-    port: process.env.PORT || 3000, 
+    port: 3000, 
     appName: process.env.APP_NAME || "My Middleware Service"
 }
 
@@ -33,8 +29,9 @@ export const authConfig = {
     authKey: process.env.API_AUTH_KEY || "some_api_key", 
 }
 
-export const backendApiConfig = { 
-    host: process.env.BACKEND_HOST || "http://localhost:1337"
+export const backendConfig = { 
+    host: process.env.BACKEND_HOST || "http://localhost:1337", 
+    apiKey: process.env.BACKEND_API_KEY || "some-api-key"
 }
 
 export const trackerConfig = { 
@@ -45,9 +42,9 @@ export const trackerConfig = {
 export const loggingConfig = { 
     maxSize: "10MB", 
     maxFiles: 5, 
-    level : "info", 
-    filePath : "/logs",
+    level : process.env.LOGGING_LEVEL || "info", 
+    filePath : "./logs",
     zippedArchive: false,
     fileName : "middleware-service_%DATE%.log", 
-    dateFormat: "YYYY-MM-DDTHH:mm:ss"
+    dateFormat: "YYYY-MM-DDTHH:mm:ssZ"
 }

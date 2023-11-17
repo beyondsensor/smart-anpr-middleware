@@ -2,13 +2,14 @@ import winston from 'winston';
 import { format } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import { loggingConfig } from '../config/app-config';
-import path from "path"
 
 const logFormat = format.combine(
   format.timestamp({
     format: loggingConfig.dateFormat,
+
   }),
   format.printf(({ timestamp, level, message }) => {
+    
     return `${timestamp} [${level}]: ${message}`;
   })
 );
