@@ -1,17 +1,17 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application } from 'express';
 import ioRouter from "./routers/io-router"
 import configRouter from './routers/config-router';
 import { appConfig } from './config/app-config';
 import { loggingMiddleware } from './middlewares/logging-middleware';
 import { authenticationMiddleware } from './middlewares/auth-middleware';
 import { errorMiddleware } from './middlewares/exception-handler-middleware';
-import appLogger from './utilities/logger';
 import trackerRouter from './routers/vehicle-router';
+import appLogger from './lib/logger';
 
 const app: Application = express();
 
 //Establish the Middlewares Needed
-app.use ( express.json() );
+app.use ( express.json({limit: '5mb'}) );
 app.use ( loggingMiddleware );
 app.use ( authenticationMiddleware );
 

@@ -3,7 +3,9 @@ dotenv.config();
 
 export const appConfig = { 
     port: 3001, 
-    appName: process.env.APP_NAME || "My Middleware Service"
+    appName: process.env.APP_NAME || "My Middleware Service",
+    authKey: process.env.APP_AUTH_KEY || "some_api_key", 
+    jsonBodyLimit: process.env.APP_JSON_BODY_LIMIT || "5mb"
 }
 
 export const mqttConfig = { 
@@ -25,18 +27,9 @@ export const mqttConfig = {
     }
 }
 
-export const authConfig = { 
-    authKey: process.env.API_AUTH_KEY || "some_api_key", 
-}
-
 export const backendConfig = { 
     host: process.env.BACKEND_HOST || "http://localhost:1337", 
     apiKey: process.env.BACKEND_API_KEY || "some-api-key"
-}
-
-export const trackerConfig = { 
-    warningTime : 30000, 
-    triggerTime : 60000
 }
 
 export const loggingConfig = { 
@@ -47,4 +40,11 @@ export const loggingConfig = {
     zippedArchive: false,
     fileName : "middleware-service_%DATE%.log", 
     dateFormat: "YYYY-MM-DDTHH:mm:ssZ"
+}
+
+export const vehicleTrackingConfig = { 
+    expiryTime: parseInt(process.env.VEHICLE_EXPIRY??"") || 5000, 
+    warningTime: parseInt(process.env.VEHICLE_TIME_TO_WARNING??"") || 30000, 
+    alertTime: parseInt(process.env.VEHICLE_TIME_TO_ALERT??"") || 60000, 
+    eventTopic: process.env.VEHICLE_EVENT_TOPIC || "beyondsensor/anpr/traffic", 
 }

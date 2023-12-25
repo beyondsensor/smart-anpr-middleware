@@ -1,4 +1,5 @@
 import appLogger from "../logger";
+import { vehicleTrackingConfig } from "../../config/app-config";
 
 
 export class VehicleTracker {
@@ -22,7 +23,7 @@ export class VehicleTracker {
         return  Date.now() - this.lastUpdated;
     }
 
-    getElapsedTime() {
+    getDwelltime() {
         return (this.lastUpdated - this.start);
     }
 
@@ -33,37 +34,42 @@ export class VehicleTracker {
     getData() {
         return {
             anpr: this.anpr,
-            //image: this.image, 
             start: new Date(this.start).toISOString(),
             lastUpdated: new Date(this.lastUpdated).toISOString(),
-            dwellTime: this.lastUpdated - this.start,
+            dwellTime: this.getDwelltime(),
             lastSeen: this.getLastSeen()
+            //image: this.image, 
         }
     }
 }
 
 export function makeTracker(props: {
+    onVehicleEnter: (tracker: VehicleTracker) => void
     onVehicleWarning: (tracker: VehicleTracker) => void
     onVehicleLeave: (tracker: VehicleTracker) => void
 }) {
-    const { onVehicleWarning, onVehicleLeave } = props;
+    
+    const { onVehicleWarning, onVehicleLeave, onVehicleEnter } = props;
     const trackers = new Map<string, VehicleTracker>();
 
     function getTrackers() {
         return Array.from(trackers.entries()).map(([key, instance]) => instance);
     }
 
-    function getTracker(anpr: string) {
+    function getTracker(anpr: string, image: string ) {
         let instance = trackers.get(anpr);
         if (instance === undefined) {
+            appLogger.info ( `New vehicle enter scene: [ ${anpr} ]`)
             instance = new VehicleTracker(anpr);
             trackers.set(anpr, instance);
-        }
+            instance.update ( image );
+            onVehicleEnter ( instance );
+        } 
         return instance;
     }
 
     function updateTracker(anpr: string, image: string) {
-        getTracker(anpr).update(image);
+        getTracker(anpr, image ).update(image);
     }
 
     function tick() {
@@ -71,11 +77,11 @@ export function makeTracker(props: {
         getTrackers().forEach(t => {
 
             // Check if the Vehicle is already Out 
-            if (t.getLastSeen() > 5000 ) {
+            if (t.getLastSeen() > vehicleTrackingConfig.expiryTime ) {
                 onVehicleLeave(t);
                 trackers.delete(t.getAnpr())
             } else {
-                if (t.getElapsedTime() > 30000) {
+                if (t.getDwelltime() > vehicleTrackingConfig.warningTime ) {
                     onVehicleWarning(t);
                 }
             }
@@ -83,6 +89,7 @@ export function makeTracker(props: {
     }
 
     setInterval ( tick, 1000 );
+    
     return {
         getTrackers,
         getTracker,

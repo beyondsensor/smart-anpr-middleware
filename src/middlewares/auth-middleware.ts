@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { authConfig } from '../config/app-config';
-const API_KEY = authConfig.authKey;
+import { appConfig } from '../config/app-config';
+const API_KEY = appConfig.authKey;
 
 export function authenticationMiddleware(req: Request, res: Response, next: NextFunction) {
 

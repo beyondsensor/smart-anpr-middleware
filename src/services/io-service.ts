@@ -1,4 +1,4 @@
-import { AdvantechDeviceSettings, AdvantechMqClient } from "../utilities/advantech/io-controller";
+import { AdvantechDeviceSettings, AdvantechMqClient } from "../lib/advantech/io-controller";
 
 /// Settings for the MQ Client 
 const deviceSettings : AdvantechDeviceSettings = {

@@ -36,12 +36,13 @@ export function makeMqttClient ( connection : ConnectionParams ) : MyMqttClient 
     client.on('message', connection.onMessage);
     client.on('error', connection.onError);
     client.on("disconnect", connection.onClose);
+    client.on("close", connection.onClose);
 
     return { 
         client : client,
         sendMessage: ( topic: string, message : string ) => { 
             appLogger.info ( "Sending Message via Client");
-            appLogger.info ( `Sending Message to Topic : ${message}`);
+            appLogger.debug ( `Sending Message to Topic : ${message}`);
             client.publish( topic, message );
             return { 
                 success: true
