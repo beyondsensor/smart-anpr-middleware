@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const appConfig = { 
-    port: 3000, 
+    port: 3001, 
     appName: process.env.APP_NAME || "My Middleware Service"
 }
 

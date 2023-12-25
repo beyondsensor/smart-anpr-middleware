@@ -1,12 +1,12 @@
 import express, { Application, Request, Response } from 'express';
 import ioRouter from "./routers/io-router"
 import configRouter from './routers/config-router';
-import eventRouter from './routers/event-router';
 import { appConfig } from './config/app-config';
 import { loggingMiddleware } from './middlewares/logging-middleware';
 import { authenticationMiddleware } from './middlewares/auth-middleware';
 import { errorMiddleware } from './middlewares/exception-handler-middleware';
 import appLogger from './utilities/logger';
+import trackerRouter from './routers/vehicle-router';
 
 const app: Application = express();
 
@@ -17,8 +17,8 @@ app.use ( authenticationMiddleware );
 
 //Register the Routers
 app.use ( "/api/io-controller", ioRouter );
-app.use ( "/api/event", eventRouter );
 app.use ( "/api/config", configRouter );
+app.use ( "/api/trackers", trackerRouter)
 
 /// Link a Middleware to manage all fo the Erros that comes into play
 app.use ( errorMiddleware );

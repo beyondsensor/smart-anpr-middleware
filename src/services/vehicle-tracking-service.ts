@@ -1,99 +1,54 @@
-import { VehicleEnterEvent, VehicleLeaveEvent, VehicleTracker } from "../types/vehicle-tracker-types";
-import { trackerConfig } from "../config/app-config";
+
+
+import { makeTracker } from "../utilities/vehicle-tracker/tracker";
 import appLogger from "../utilities/logger";
-import { ioService } from "./io-service";
-import { json } from "express";
-/// Tracking Object for Trackers 
-const trackers: Map<string, VehicleTracker> = new Map<string, VehicleTracker>();
+import { makeAnprCameraListener } from "../utilities/hikvision/anpr-camera-listener";
+import { SimulateVehicleRequest } from "../types/vehicle-tracking";
+import { application } from "express";
 
-
-export const vehicleTrackingService = { 
-    onVehicleEnter, 
-    onVehicleExit
-}
-
-/**
- * Trigger that a Vehicle has Entered
- * @param ev Event Informaiton 
- */
-function onVehicleEnter(ev: VehicleEnterEvent) {
-    if (trackers.has(ev.anpr)) {
-        appLogger.info(`[${ev.anpr}] Vehicle already tracked`);
-    } else {
-        // 1. Create a Tracker Instance and Start Managing It 
-        const tracker = makeVehicleTracker(ev);
-        trackers.set(ev.anpr, tracker);
+const cameraListener = makeAnprCameraListener({
+    host: "",
+    user: "",
+    password: "",
+    onData: function (message: any): void {
+        const { anpr, image } = message;
+        appLogger.info(`Received data from Camera`);
+        trackingManager.updateTracker(anpr, image);
     }
-}
+});
 
-/**
- * When a Vehicle Left the Scene 
- * @param ev 
- */
-function onVehicleExit(ev: VehicleLeaveEvent) {
-    appLogger.info(`[${ev.anpr}] Vehicle Left Area Event Received`);
-    removeTracker(ev.anpr);
-}
+const trackingManager = makeTracker({
 
-/**
- * Remove the Tracker, which typically meant that the Vehcile is no longer there 
- * @param anpr 
- */
-function removeTracker(anpr: string) {
-    appLogger.info(`[${anpr}] Removed from Vehicle Tracker`);
-    const t = trackers.get(anpr);
-    t?.stop();
-    trackers.delete(anpr);
-}
+    onVehicleLeave: (tracker) => {
+        appLogger.debug(`Vehicle leave scene : [${JSON.stringify(tracker.getData())}]`)
+    },
 
-/**
- * Create a Tracker 
- * @param ev 
- * @returns 
- */
-function makeVehicleTracker(ev: VehicleEnterEvent): VehicleTracker {
+    onVehicleWarning: (tracker) => {
+        appLogger.debug(`Vehicle warning scene : [${JSON.stringify(tracker.getData())}]`)
+    },
 
-    appLogger.info(`[${ev.anpr}] Vehicle Tracking Started for Vehicle`);
-    appLogger.debug(`${JSON.stringify(trackerConfig)}`);
+});
 
-    /// When Triggered, a warning Message is sent  
-    const warningTimeout = setTimeout(() => {
-        // If the Timeout is reached, start Tracking the Subject 
-        appLogger.info(`[${ev.anpr}] Vehicle Tracking Started for Vehicle`);
-        const warning = {
-            warningInSeconds: trackerConfig.triggerTime,
-            ev: ev
+export const trackingService = {
+    getTrackers: () => trackingManager.getTrackers().map(t => t.getData()),
+
+    emulateUpdateTracker: (anpr: string, image: string) => trackingManager.updateTracker(anpr, image), 
+
+    emulateVehiceData: ( request : SimulateVehicleRequest ) => { 
+
+        let count = 0;
+        const iterations = Math.ceil(request.timeInScene / request.intervalPerTick)
+        const interval = setInterval ( () => { 
+            appLogger.debug ( `[${request.anpr}] tick [${count} of ${iterations}]`);
+            trackingManager.updateTracker ( request.anpr, request.image );
+            count++;
+            if ( count >= iterations )
+                clearInterval ( interval );
+        }, request.intervalPerTick);
+
+        return { 
+            message : "Success", 
+            request : { ... request }
         }
-        ioService.triggerAll ( true );
-        /// TODO : Send Warning to MQ Server for Triggers 
-        /// TODO : Trigger Alarm via MQ Controller 
-    }, trackerConfig.warningTime);
-    /// When Triggered, it means that the Object is automatically deleted 
-    const triggerTimeout = setTimeout(() => {
-        appLogger.info(`[${ev.anpr}] Vehicle Recorded for Illegal Parking`);
-        removeTracker(ev.anpr);
-        ioService.triggerAll ( false);
-        /// TODO : Send to Backend if the Vehicle stays Beyond This 
-        /// TODO : Send a Message to Stop the Warning Trigger 
-    },  trackerConfig.triggerTime);
-
-    /// Stop the Trigger Altogether 
-    function stopTracker() {
-        appLogger.info(`[${ev.anpr}] Tracker Stopped`);
-        clearTimeout(warningTimeout);
-        clearTimeout(triggerTimeout);
-        ioService.triggerAll ( false);
     }
-
-    /// Return the Tracking Object 
-    return {
-        anpr: ev.anpr,
-        snapshot: ev.snapshotInBase64,
-        warningTimeout: warningTimeout,
-        triggerTimeout: triggerTimeout,
-        stop: stopTracker,
-    };
 }
-
-
-
