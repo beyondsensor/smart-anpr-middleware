@@ -20,4 +20,9 @@ trackerRouter.post("/emulator/simulate-vehicle-data",async (req: Request, res: R
     res.json(response);
 })
 
+trackerRouter.get ( "/current-state", async ( req: Request, res : Response  ) => { 
+    const response = trackingService.getCurrentState(); 
+    res.json ( response) ; 
+}) 
+
 export default trackerRouter;

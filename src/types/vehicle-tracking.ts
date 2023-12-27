@@ -13,3 +13,20 @@ export const simulateVehicleRequestSchema = z.object ( {
     intervalPerTick: z.number().default(1000) 
 })
 export type SimulateVehicleRequest = z.infer < typeof simulateVehicleRequestSchema>; 
+
+export interface VehiceInScene { 
+    anpr: string;
+    dwellTime: number;
+}
+
+export interface WarningState extends VehiceInScene { 
+    snapshot: string;
+}
+
+export interface SceneState {
+    hasViolation: boolean,
+    currentNotice?: WarningState, 
+    vehiclesInScene: VehiceInScene[]
+}
+
+

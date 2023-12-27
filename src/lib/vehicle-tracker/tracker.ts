@@ -1,6 +1,6 @@
 import appLogger from "../logger";
 import { vehicleTrackingConfig } from "../../config/app-config";
-
+import { SceneState, WarningState } from "../../types/vehicle-tracking";
 
 export class VehicleTracker {
 
@@ -20,7 +20,7 @@ export class VehicleTracker {
     }
 
     getLastSeen() {
-        return  Date.now() - this.lastUpdated;
+        return Date.now() - this.lastUpdated;
     }
 
     getDwelltime() {
@@ -29,8 +29,10 @@ export class VehicleTracker {
 
     getAnpr() { return this.anpr; }
 
-    getImage () { return this.image; }
-    
+    getImage() { return this.image; }
+
+    getCameraId () { return this.cameraId; }
+
     getData() {
         return {
             anpr: this.anpr,
@@ -44,57 +46,82 @@ export class VehicleTracker {
 }
 
 export function makeTracker(props: {
-    onVehicleEnter: (tracker: VehicleTracker) => void
-    onVehicleWarning: (tracker: VehicleTracker) => void
-    onVehicleLeave: (tracker: VehicleTracker) => void
+    onStatusUpdate: (scene : SceneState ) => void;
 }) {
-    
-    const { onVehicleWarning, onVehicleLeave, onVehicleEnter } = props;
+
     const trackers = new Map<string, VehicleTracker>();
 
     function getTrackers() {
         return Array.from(trackers.entries()).map(([key, instance]) => instance);
     }
 
-    function getTracker(anpr: string, image: string ) {
+    function getTracker(anpr: string, image: string) {
         let instance = trackers.get(anpr);
         if (instance === undefined) {
-            appLogger.info ( `New vehicle enter scene: [ ${anpr} ]`)
+            appLogger.info(`New vehicle enter scene: [ ${anpr} ]`)
             instance = new VehicleTracker(anpr);
             trackers.set(anpr, instance);
-            instance.update ( image );
-            onVehicleEnter ( instance );
-        } 
+            instance.update(image);
+            //onVehicleEnter(instance);
+        }
         return instance;
     }
 
     function updateTracker(anpr: string, image: string) {
-        getTracker(anpr, image ).update(image);
+        getTracker(anpr, image).update(image);
     }
 
     function tick() {
-        appLogger.debug ( "Vehicletracker : tick");
+        appLogger.debug("Vehicletracker : tick");
         getTrackers().forEach(t => {
 
             // Check if the Vehicle is already Out 
-            if (t.getLastSeen() > vehicleTrackingConfig.expiryTime ) {
-                onVehicleLeave(t);
+            if (t.getLastSeen() > vehicleTrackingConfig.expiryTime) {
+                //onVehicleLeave(t);
                 trackers.delete(t.getAnpr())
             } else {
-                if (t.getDwelltime() > vehicleTrackingConfig.warningTime ) {
-                    onVehicleWarning(t);
+                if (t.getDwelltime() > vehicleTrackingConfig.warningTime) {
+                    //onVehicleWarning(t);
                 }
             }
         })
+        props.onStatusUpdate ( getCurrentState() );
     }
 
-    setInterval ( tick, 1000 );
-    
+    function getCurrentState() : SceneState {
+        
+        /// Sort the Vehicle Lists  
+        const vehicles = getTrackers().map(t => {
+            return {
+                anpr: t.getAnpr(),
+                dwellTime: t.getDwelltime()
+            }
+        }).sort((a, b) => b.dwellTime - a.dwellTime);
+        
+        ///Check if there is any violations in the first place 
+        const hasViolation = vehicles.length > 0 && vehicles[0].dwellTime > vehicleTrackingConfig.warningTime;
+        /// Get the First Instance to manage the delivery if there is Violation
+        const currentVehicle : WarningState | undefined = hasViolation ? {
+            anpr:  vehicles[0].anpr, 
+            dwellTime: vehicles[0].dwellTime, 
+            snapshot: trackers.get(vehicles[0].anpr)?.getImage()??""
+        } : undefined;
+
+        return { 
+            hasViolation: hasViolation, 
+            currentNotice: currentVehicle, 
+            vehiclesInScene: vehicles
+        }
+    }
+
+    setInterval(tick, 1000);
+
     return {
         getTrackers,
         getTracker,
         updateTracker,
-        tick
+        tick,
+        getCurrentState
     }
 }
 

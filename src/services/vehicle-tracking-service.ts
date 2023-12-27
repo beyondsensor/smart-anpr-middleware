@@ -45,39 +45,10 @@ const mqttClient = makeMqttClient ( {
 })
 
 const trackingManager = makeTracker({
-
-    onVehicleEnter: (tracker) => { 
-        appLogger.info ( `Vehicle enter scene : [${tracker.getAnpr()}]`)
-        appLogger.debug(`Vehicle leave scene : [${JSON.stringify(tracker.getData())}]`);
-        const message = { 
-            ... tracker.getData(), 
-            type: "vehicle-enter",
-            image: tracker.getImage()
-        }
-        mqttClient.sendMessage ( vehicleTrackingConfig.eventTopic, JSON.stringify(message));
-    },
-
-    onVehicleLeave: (tracker) => {
-        appLogger.info ( `Vehicle leaving scene : [${tracker.getAnpr()}]`)
-        appLogger.debug(`Vehicle leave scene : [${JSON.stringify(tracker.getData())}]`);
-        const message = { 
-            ... tracker.getData(), 
-            type: "vehicle-leave",
-            image: tracker.getImage()
-        }
-        mqttClient.sendMessage ( vehicleTrackingConfig.eventTopic, JSON.stringify(message));
-    },
-
-    onVehicleWarning: (tracker) => {
-        appLogger.info ( `Vehicle dwelling warning : [${tracker.getAnpr()} with a dwelltime of ${tracker.getDwelltime()}ms ]`)
-        appLogger.debug(`Vehicle warning scene : [${JSON.stringify(tracker.getData())}]`)
-        const message = { 
-            ... tracker.getData(), 
-            type: "vehicle-warning",
-            image: tracker.getImage()
-        }
-        mqttClient.sendMessage ( vehicleTrackingConfig.eventTopic, JSON.stringify(message));
-    },
+    onStatusUpdate: (sceneState ) => { 
+        appLogger.info ( `Sending Update`);
+        mqttClient.sendMessage ( vehicleTrackingConfig.eventTopic, JSON.stringify ( sceneState));
+    }
 });
 
 export const trackingService = {
@@ -101,5 +72,9 @@ export const trackingService = {
             message : "Success", 
             request : { ... request }
         }
+    }, 
+
+    getCurrentState: () => { 
+        return trackingManager.getCurrentState()
     }
 }
