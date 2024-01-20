@@ -15,9 +15,9 @@ app.use ( express.json({limit: '10mb'}) );
 app.use ( loggingMiddleware );
 
 //Register the Routers
-app.use ( "/api/io-controller", ioRouter );
+//app.use ( "/api/io-controller", ioRouter );
 app.use ( "/api/config", configRouter );
-app.use ( "/api/trackers", trackerRouter)
+//app.use ( "/api/trackers", trackerRouter)
 app.use ( "/api/hikvision", hikCctvRouter);
 
 /// Link a Middleware to manage all fo the Erros that comes into play

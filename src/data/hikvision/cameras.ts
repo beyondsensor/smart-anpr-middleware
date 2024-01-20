@@ -30,7 +30,7 @@ export const cctvList : HikIsapiPluginConfig[]= [
     },
     {
         id: "2",
-        name: "Demo Camera Set", 
+        name: "Office Entrance FR Terminal", 
         protocol: "http",
         host: "192.168.0.101",
         user: "admin",
@@ -41,16 +41,5 @@ export const cctvList : HikIsapiPluginConfig[]= [
         dataOffset: 4, 
     },
     
-    {
-        id: "3",
-        name: "Testing Camera", 
-        protocol: "http",
-        host: "192.168.0.124",
-        user: "admin",
-        password: "Admin888",
-        boundary: "MIME_boundary", 
-        axiosInstanceType: "axiosDigest",
-        imageOffset: 0, 
-        dataOffset: 4, 
-    }, 
+   
 ]

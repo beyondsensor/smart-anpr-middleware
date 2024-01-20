@@ -22,9 +22,11 @@ const callback: AlarmBufferCallback = (m) => {
     }
 }
 
-const plugin = new HikIsapiPlugin(configuredCameras[2]);
+const plugin = new HikIsapiPlugin(configuredCameras[0]);
 
 
 
-plugin.getAlertStream(callback);
-    
+plugin.getDeviceInfo()
+.then ( e => { 
+    console.log ( "Capabilities", e);
+})
