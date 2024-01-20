@@ -5,34 +5,7 @@ import * as path from "path"
 import axios, { Axios as AxiosInstance } from 'axios';
 import { hikConfig, loggingConfig } from '../../config/app-config';
 import appLogger from '../../lib/logger';
-function ensureDirectoryExists(directoryPath: string): void {
-    // Check if the directory exists
-    if (!fs.existsSync(directoryPath)) {
-        // If it doesn't exist, create it recursively
-        fs.mkdirSync(directoryPath, { recursive: true });
-        appLogger.info(`[HikCameraPlugin] Directory created: ${directoryPath}`);
-    } else {
-        appLogger.info(`[HikCameraPlugin] Directory already exists: ${directoryPath}`);
-    }
-}
-ensureDirectoryExists(hikConfig.imageDir);
-ensureDirectoryExists(hikConfig.loggingPath);
-
-type Protocol = "http" | "https"
-type AxiosClientType = "axios" | "axiosDigest"
-type BoundaryType = "MIME_boundary" | "7daf10c20d06";
-export interface HikIsapiPluginConfig {
-    id: string,
-    name: string, 
-    protocol: Protocol,
-    host: string,
-    user: string,
-    password: string,
-    boundary: BoundaryType, // This is to Simplify the Error, because we are leveraging on this field to seperate the Data Strea, 
-    axiosInstanceType: AxiosClientType,
-    imageOffset: number,
-    dataOffset: number
-}
+import { AxiosClientType, HikIsapiPluginConfig } from '../../data/cameras';
 
 export class HikIsapiPlugin {
 
@@ -47,7 +20,7 @@ export class HikIsapiPlugin {
         this.axiosInstance = makeAxiosClient(config.axiosInstanceType, config.user, config.password);
     }
 
-    private info ( message : string) { 
+    private info(message: string) {
         appLogger.info(`[ISAPI] ${this.config.host} ${message}`)
     }
 
@@ -123,3 +96,17 @@ function makeAxiosClient(type: AxiosClientType, user: string, password: string):
             auth: { username: user, password: password }
         })
 }
+
+
+function ensureDirectoryExists(directoryPath: string): void {
+    // Check if the directory exists
+    if (!fs.existsSync(directoryPath)) {
+        // If it doesn't exist, create it recursively
+        fs.mkdirSync(directoryPath, { recursive: true });
+        appLogger.info(`[HikCameraPlugin] Directory created: ${directoryPath}`);
+    } else {
+        appLogger.info(`[HikCameraPlugin] Directory already exists: ${directoryPath}`);
+    }
+}
+ensureDirectoryExists(hikConfig.imageDir);
+ensureDirectoryExists(hikConfig.loggingPath);
