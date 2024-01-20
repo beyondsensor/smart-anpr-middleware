@@ -1,7 +1,5 @@
-
-import { HikIsapiPlugin } from "../plugins/hikvision/hik-isapi-plugin";
+import { AlarmBufferCallback, HikIsapiPlugin } from "../plugins/hikvision/hik-isapi-plugin";
 import * as fs from "fs";
-import { AlarmBufferCallback } from "../plugins/hikvision/read-alarm-data";
 import { cctvList as configuredCameras } from "../data/hikvision/cameras";
 
 const callback: AlarmBufferCallback = (m) => {

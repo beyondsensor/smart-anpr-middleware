@@ -1,7 +1,8 @@
-import { AdvantechDeviceSettings, AdvantechMqClient } from "../lib/advantech/io-controller";
+import { AdvantechDeviceSettings } from "../data/io-controller/io-controllers";
+import { AdamControllerPlugin } from "../plugins/advantech/adam-controller-plugin";
 
 /// Settings for the MQ Client 
-const deviceSettings : AdvantechDeviceSettings = {
+const deviceSettings: AdvantechDeviceSettings = {
     id: 1,
     name: "device_name",
     mqConfigs: {
@@ -14,36 +15,36 @@ const deviceSettings : AdvantechDeviceSettings = {
 };
 
 /// Client Manager 
-const client = new AdvantechMqClient ( deviceSettings );
+const client = new AdamControllerPlugin(deviceSettings);
 
-function triggerAll ( value : boolean ) { 
-    return deviceSettings.dos.map ( e => { 
-        return client.trigger ( e, value );
+function triggerAll(value: boolean) {
+    return deviceSettings.dos.map(e => {
+        return client.trigger(e, value);
     })
 }
 
-function trigger( doId : string, value : boolean ) { 
-    return client.trigger ( doId, value );
+function trigger(doId: string, value: boolean) {
+    return client.trigger(doId, value);
 }
 
-function getStatus () { 
+function getStatus() {
     return client.status;
 }
 
-function getState () { 
+function getState() {
     return client.state;
 }
 
-function getConfig () { 
+function getConfig() {
     return client.config;
 }
 
 
-export const ioService = { 
-    trigger, 
-    getStatus, 
-    getConfig, 
-    getState, 
+export const ioService = {
+    trigger,
+    getStatus,
+    getConfig,
+    getState,
     triggerAll
 }
 

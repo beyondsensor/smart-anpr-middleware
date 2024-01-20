@@ -1,20 +1,9 @@
-import appLogger from "../logger";
-import { MyMqttClient, makeMqttClient } from "../mqtt";
 import { mqttConfig } from "../../config/app-config";
+import { AdvantechDeviceSettings } from "../../data/io-controller/io-controllers";
+import appLogger from "../../lib/logger";
+import { MyMqttClient, makeMqttClient } from "../../lib/mqtt";
 
-export interface AdvantechDeviceSettings {
-  id: number,
-  name: string;
-  mqConfigs: {
-    willTopic: string;
-    statusTopic: string;
-    triggerPrefix: string;
-  },
-  dis: string[];
-  dos: string[];
-};
-
-export class AdvantechMqClient {
+export class AdamControllerPlugin {
 
   config: AdvantechDeviceSettings;
   status: any ={};
