@@ -1,6 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+export const hikConfig = { 
+    maxBufferSize: process.env.HIK_MAX_ALARM_BUFFER || "5mb", 
+    loggingPath: process.env.HIK_LOGGING_PATH || "debug/", 
+    imageDir: process.env.HIK_ALARM_IMAGES_PATH || "data/alarms/images"
+}
+
 export const appConfig = { 
     port: 3001, 
     appName: process.env.APP_NAME || "My Middleware Service",
