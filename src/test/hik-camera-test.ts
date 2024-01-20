@@ -2,7 +2,7 @@
 import { HikIsapiPlugin } from "../plugins/hikvision/hik-isapi-plugin";
 import * as fs from "fs";
 import { AlarmBufferCallback } from "../plugins/hikvision/read-alarm-data";
-import { cctvList as configuredCameras } from "../data/cameras";
+import { cctvList as configuredCameras } from "../data/hikvision/cameras";
 
 const callback: AlarmBufferCallback = (m) => {
     console.log(`Index Sequence : [${m.index}] [Content Type: ${m.contentType}] [Declared Length: ${m.contentLength}] [Actual Data Length: ${m.messageData.length}]`)

@@ -5,7 +5,7 @@ import * as path from "path"
 import axios, { Axios as AxiosInstance } from 'axios';
 import { hikConfig, loggingConfig } from '../../config/app-config';
 import appLogger from '../../lib/logger';
-import { AxiosClientType, HikIsapiPluginConfig } from '../../data/cameras';
+import { AxiosClientType, HikIsapiPluginConfig } from '../../data/hikvision/cameras';
 
 export class HikIsapiPlugin {
 
