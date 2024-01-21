@@ -1,11 +1,11 @@
 import { cctvList } from "../data/hikvision/cameras";
-import { HikIsapiPlugin } from "../plugins/hikvision/hik-isapi-plugin";
+import { makeHikIsapiPlugin } from "../plugins/hikvision/hik-isapi-plugin";
 
 const cctvs = cctvList.map(config => {
     return {
         id: config.id,
         config: { ...config },
-        isapiPlugin: new HikIsapiPlugin(config)
+        isapiPlugin: makeHikIsapiPlugin(config)
     }
 })
 

@@ -9,6 +9,8 @@ export interface AdvantechDeviceSettings {
     dis: string[];
     dos: string[];
   };
+
+  
 /// Settings for the MQ Client 
 const deviceSettings : AdvantechDeviceSettings = {
     id: 1,

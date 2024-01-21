@@ -6,15 +6,19 @@ import { hikConfig, loggingConfig } from '../../config/app-config';
 import appLogger from '../../lib/logger';
 import { AxiosClientType, HikIsapiPluginConfig } from '../../data/hikvision/cameras';
 
-export interface AlarmMessage { 
-    index: number; 
+export interface AlarmMessage {
+    index: number;
     contentLength: number,
-    contentType?: string,  
+    contentType: "application/xml" | "application/json" | "image/jpeg" | "unknown",
     meta?: any,
-    messageData: number[], 
+    messageData: number[],
 }
 
-export class HikIsapiPlugin {
+export function makeHikIsapiPlugin ( config : HikIsapiPluginConfig  ) { 
+    return new HikIsapiPlugin ( config ); 
+}
+
+class HikIsapiPlugin {
 
     private config: HikIsapiPluginConfig;
     private axiosInstance: AxiosDigest | AxiosInstance;
@@ -97,64 +101,64 @@ export class HikIsapiPlugin {
     }
 }
 
-export type AlarmBufferCallback = ( m : AlarmMessage ) => void
-export class EventAlarmBuffer { 
+export type AlarmBufferCallback = (m: AlarmMessage) => void
+export class EventAlarmBuffer {
 
-    _buffer : Buffer = Buffer.from ("");
-    i = 0; 
+    _buffer: Buffer = Buffer.from("");
+    i = 0;
 
-    constructor() { 
+    constructor() {
 
     }
 
-    ParseAlarmData(incomingData: Buffer, boundary: string, imageOffset: number, dataOffset: number, callback : AlarmBufferCallback) {
+    ParseAlarmData(incomingData: Buffer, boundary: string, imageOffset: number, dataOffset: number, callback: AlarmBufferCallback) {
 
         console.log("Incoming Buffer", incomingData.length);
         /// Join the Buffer as a whole 
         this._buffer = Buffer.concat([this._buffer, incomingData]);
         //console.log("Buffer Length", _buffer.length);
-    
+
         /// Get the Buffer from the List 
         const data: number[] = Array.from(this._buffer);
-    
+
         // Convert string to byte array using TextEncoder
         const encoder = new TextEncoder();
-        const resultByteArray: number[] = Array.from(encoder.encode("--" + boundary ));
+        const resultByteArray: number[] = Array.from(encoder.encode("--" + boundary));
         let iNextBoundary = indexOf(data, 0, resultByteArray);
         let iLen = 0;
-    
+
         /// Process the Incoming Message 
         while (iNextBoundary >= 0) {
-    
+
             const currentIndex = iNextBoundary;
             iLen = iNextBoundary;
-    
+
             // We need to know the next boundary, so that we can manage what to slice
             iNextBoundary = indexOf(data, iNextBoundary + ("--" + boundary).length, resultByteArray);
             if (iNextBoundary === -1) {
                 break;
             }
-    
+
             const dataBuffer = data.slice(currentIndex + resultByteArray.length, iNextBoundary);
             const contentLength = getContentLength(dataBuffer);
-            const contentType = getContentType(dataBuffer);
+            const contentType = getContentType(dataBuffer) as "application/xml" | "application/json" | "image/jpeg" | "unknown";
             const meta = getOtherMeta(dataBuffer);
             const offset = contentType?.includes("image") ? imageOffset : dataOffset;
             const actualMessages = dataBuffer.slice(dataBuffer.length - contentLength - offset);
-            
-            callback ( {
+
+            callback({
                 index: this.i,
                 contentLength,
-                contentType,
+                contentType: contentType ? contentType : "unknown",
                 meta,
-                messageData: [... actualMessages ]
+                messageData: [...actualMessages]
             })
             this.i++;
         }
-    
-        this._buffer = Buffer.from( data.slice(iLen)); 
-        console.log ( "Processing Buffer complete : ", iLen);
-        console.log ( "Buffer left : ", this._buffer.length);
+
+        this._buffer = Buffer.from(data.slice(iLen));
+        console.log("Processing Buffer complete : ", iLen);
+        console.log("Buffer left : ", this._buffer.length);
     }
 }
 

@@ -5,7 +5,6 @@ import { appConfig } from './config/app-config';
 import { loggingMiddleware } from './middlewares/logging-middleware';
 import { authenticationMiddleware } from './middlewares/auth-middleware';
 import { errorMiddleware } from './middlewares/exception-handler-middleware';
-import trackerRouter from './routers/vehicle-router';
 import appLogger from './lib/logger';
 import hikCctvRouter from './routers/hik-camera-router';
 const app: Application = express();
