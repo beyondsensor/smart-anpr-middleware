@@ -25,6 +25,7 @@ class WebhookPlugin {
             appLogger.info(response);
         } catch ( error ) { 
             appLogger.error( error );
+            console.log ( error )
         }
     }
 }

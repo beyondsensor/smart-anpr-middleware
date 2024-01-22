@@ -70,7 +70,7 @@ const onJsonWebhook : WebHookConfig = {
 }
 const onImageWebhook : WebHookConfig = {
     id: "1",
-    name: "OnJsonEvent",
+    name: "OnImageEvent",
     url: "http://localhost:3001/api/workflows/attendance-taking/on-image",
     method: "POST",
     headers: {
