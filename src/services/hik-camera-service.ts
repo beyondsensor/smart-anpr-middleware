@@ -15,10 +15,13 @@ export async function getCctvList() {
             try {
                 const deviceInfo = await e.isapiPlugin.getDeviceInfo();
                 const capabilities = await e.isapiPlugin.getCapabilities();
+                const event = await e.isapiPlugin.getSubcribeEventCap();
+                
                 resolve({
                     config: { ...e.config },
                     deviceInfo,
                     capabilities,
+                    event
                 });
             } catch (error) {
                 reject(error);
