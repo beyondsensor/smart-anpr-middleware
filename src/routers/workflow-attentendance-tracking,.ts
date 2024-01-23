@@ -7,22 +7,6 @@ const loggingConfig = {
     dir: "data/alarams",
 }
 
-/**
- *     deviceName: 'Main Door',
-    majorEventType: 3,
-    subEventType: 1029,
-    verifyNo: 242,
-    serialNo: 11251,
-    currentVerifyMode: 'invalid',
-    currentEvent: true,
-    frontSerialNo: 11250,
-    attendanceStatus: 'undefined',
-    label: '',
-    statusValue: 0,
-    mask: 'unknown',
-    helmet: 'unknown',
-    purePwdVerifyEnable: true
- */
 const AccessControllerEventSchema = z.object({
     deviceName: z.string(),
     majorEventType: z.number(),
@@ -71,8 +55,7 @@ function processAccessControllerEvent(event: GeneralEvent) {
     }
 }
 
-function processMessage(event: GeneralEvent) {
-    
+function logMessage ( event: GeneralEvent ) { 
     const directory = `${loggingConfig.dir}/${event.ipAddress}`;
     
     // Check if the directory exists
@@ -93,18 +76,23 @@ function processMessage(event: GeneralEvent) {
 
     fs.writeFileSync ( `${directory}/${Date.now()}.json`, JSON.stringify(event, null, 2))
 
+}
+
+function processMessage(event: GeneralEvent) {
+    
+
     if (event.eventType === "videoloss") {
-        appLogger.info("Just a video loss event");
+        appLogger.info("Just a video loss event from ${}");
         return;
     }
 
     if (event.eventType === "AccessControllerEvent") {
         console.log("AccessControllerEvent Receieved")
+        logMessage ( event );
         processAccessControllerEvent(event);
         return;
     }
     appLogger.info(`Mesage ${JSON.stringify(event)}`);
-
 }
 
 attendanceWorkflowRouter.post("/on-json-event", (req: Request, res: Response) => {
