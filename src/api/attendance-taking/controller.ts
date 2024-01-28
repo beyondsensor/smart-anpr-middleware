@@ -14,6 +14,11 @@ const attendanceTakingController = {
             res.status(400).send( { message: "Bad Request"} );
         }
     }, 
+
+    GetAll: async function ( req : Request, res : Response ) { 
+        const records = await AttendanceTakingService.GetAllFacialEvents(); 
+        res.send ( records );
+    }
 }
 
 

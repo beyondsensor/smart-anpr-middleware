@@ -3,6 +3,12 @@ import { EventSchema } from "./types"
 const xata = getXataClient();
 
 const AttendanceTakingService = {
+
+    GetAllFacialEvents : async function () { 
+        const results = await xata.db.AccessControlEvent.getAll();
+        return results;
+    }, 
+
     OnFacialEvent : async function(meta: any, snapshotInBase64: string) {
         try {
             const results = EventSchema.parse(meta);
