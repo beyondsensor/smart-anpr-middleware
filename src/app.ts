@@ -9,16 +9,17 @@ import appLogger from './lib/logger';
 import hikCctvRouter from './routers/hik-camera-router';
 import attendanceWorkflowRouter from './routers/event-router';
 import metaTestRouter from './api/meta-test/router';
+import attendanceTakingRouter from './api/attendance-taking/router';
 const app: Application = express();
 
 //Establish the Middlewares Needed
-app.use ( express.json({limit: '10mb'}) );
+app.use ( express.json({limit: '20mb'}) );
 app.use ( loggingMiddleware );
 
 //Register the Routers
 //app.use ( "/api/io-controller", ioRouter );
-app.use ( "/api/config", configRouter );
-app.use ( "", metaTestRouter );
+app.use ( "/api/meta-test", metaTestRouter );
+app.use ( "/api/attendance-taking", attendanceTakingRouter );
 
 //app.use ( "/api/trackers", trackerRouter)
 app.use ( "/api/hikvision", hikCctvRouter);

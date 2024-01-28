@@ -1,7 +1,7 @@
 import { XataFile } from "@xata.io/client"; // Generated with CLI
 import { getXataClient } from "../../db/xata";
 import { fileToBase64 } from "../../lib/base-64";
-
+import multer  from "multer";
 const xata = getXataClient();
 
 async function FindOne(id: string) {
@@ -23,12 +23,20 @@ async function GetAll() {
     return records;
 }
 
-async function Create(name: string, image: File) {
-    const record = await xata.db.MetaDump_Testing.create({
-        name: "longer text",
-        snapshot: XataFile.fromBase64((await fileToBase64(image))),
-    });
-    return record.id;
+async function Create(name: string, image : string ) {
+    try { 
+        const record = await xata.db.MetaDump_Testing.create({
+            name: name,
+            snapshot: { 
+                name: 'image.jpg', 
+                mediaType: 'image/jpeg', 
+                base64Content: image
+            }
+        });
+        return record.id;
+    } catch ( error ) { 
+        console.log ( error )
+    }
 }
 
 async function Delete(id: string) {
