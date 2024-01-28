@@ -1,6 +1,4 @@
 import express, { Application } from 'express';
-import ioRouter from "./routers/io-router"
-import configRouter from './routers/config-router';
 import { appConfig } from './config/app-config';
 import { loggingMiddleware } from './middlewares/logging-middleware';
 import { authenticationMiddleware } from './middlewares/auth-middleware';

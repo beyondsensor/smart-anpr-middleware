@@ -1,5 +1,5 @@
-import { AdvantechDeviceSettings } from "../data/io-controller/io-controllers";
-import { AdamControllerPlugin } from "../plugins/advantech/adam-controller-plugin";
+import { AdvantechDeviceSettings } from "../../data/io-controller/io-controllers";
+import { AdamControllerPlugin } from "../../plugins/advantech/adam-controller-plugin";
 
 /// Settings for the MQ Client 
 const deviceSettings: AdvantechDeviceSettings = {

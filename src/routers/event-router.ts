@@ -43,7 +43,6 @@ const EventSchema = z.object({
     AccessControllerEvent: AccessControllerEventSchema.optional()
 });
 
-
 type GeneralEvent = z.infer<typeof EventSchema>;
 type AccessControllerEvent = z.infer<typeof AccessControllerEventSchema>
 

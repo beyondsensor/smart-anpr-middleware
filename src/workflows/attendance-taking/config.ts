@@ -16,29 +16,17 @@ export const cameraConfig : HikIsapiPluginConfig = {
     dataOffset: 4, 
 }
 
-export const onJsonWebhook : WebHookConfig = {
-    id: "1",
-    name: "OnJsonEvent",
-    url: "http://localhost:3001/api/workflows/attendance-taking/on-json-event",
-    method: "POST",
-    headers: {
-        "Authorizaition": "some-authorization-key", 
-        'Content-Type': 'application/json'
-    }
-}
-
 export const onImageWebhook : WebHookConfig = {
     id: "1",
     name: "OnJsonEvent",
-    url: "http://localhost:3001/api/workflows/attendance-taking/on-image",
+    url: "http://localhost:3001/api/attendance-taking/on-facial-event",
     method: "POST",
     headers: {
-        "Authorizaition": "some-authorization-key", 
+        "Authorization": "some-authorization-key", 
         'Content-Type': 'multipart/form-data'
     }
 }
 
 export const plugin = makeHikIsapiPlugin( cameraConfig );
-export const onJsonWebHook = makeWebhook ( onJsonWebhook );
 export const onImageWebHook = makeWebhook ( onImageWebhook)
 
