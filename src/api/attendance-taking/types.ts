@@ -10,5 +10,6 @@ export const CreateFacialEventSchema = z.object( {
     deviceName: z.string().default(""), 
     cardReaderKind: z.string().default(""), 
     attendanceStatus: z.string().default(""), 
-    currentVerificationMode: z.string().default("")
+    currentVerificationMode: z.string().default(""), 
+    faceRect: z.string()
 }); 
