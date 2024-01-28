@@ -1,0 +1,16 @@
+{
+  "id": "mig_cmo7hf8j7ui57525cro0",
+  "parentID": "mig_cmo7hblj36ti7njv1ah0",
+  "checksum": "1:3fb2440279a03f6216b9223192de8399622c399fd05f8f58af8508f555815768",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "macAddress",
+          "type": "string"
+        },
+        "table": "hik_device_event"
+      }
+    }
+  ]
+}

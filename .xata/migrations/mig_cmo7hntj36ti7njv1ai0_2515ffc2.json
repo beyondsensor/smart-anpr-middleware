@@ -1,0 +1,16 @@
+{
+  "id": "mig_cmo7hntj36ti7njv1ai0",
+  "parentID": "mig_cmo7hgoj7ui57525crp0",
+  "checksum": "1:2515ffc2f38bae5dc1784f8ae2a756adf58bb7abeaed4df89c621d5c3396fa97",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "eventDatetime",
+          "type": "datetime"
+        },
+        "table": "hik_device_event"
+      }
+    }
+  ]
+}

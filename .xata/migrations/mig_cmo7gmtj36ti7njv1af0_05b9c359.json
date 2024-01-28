@@ -1,0 +1,11 @@
+{
+  "id": "mig_cmo7gmtj36ti7njv1af0",
+  "checksum": "1:05b9c359ed77d2b6b33436c9f5df4f0342df1d65352ddb3289593bc8eab7675e",
+  "operations": [
+    {
+      "addTable": {
+        "table": "hik_device_event"
+      }
+    }
+  ]
+}

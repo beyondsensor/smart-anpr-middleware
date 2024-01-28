@@ -7,7 +7,7 @@ import { authenticationMiddleware } from './middlewares/auth-middleware';
 import { errorMiddleware } from './middlewares/exception-handler-middleware';
 import appLogger from './lib/logger';
 import hikCctvRouter from './routers/hik-camera-router';
-import attendanceWorkflowRouter from './routers/workflow-attentendance-tracking,';
+import attendanceWorkflowRouter from './routers/event-router';
 const app: Application = express();
 
 //Establish the Middlewares Needed

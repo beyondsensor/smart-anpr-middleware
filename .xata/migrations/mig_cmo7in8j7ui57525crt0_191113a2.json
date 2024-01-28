@@ -1,0 +1,16 @@
+{
+  "id": "mig_cmo7in8j7ui57525crt0",
+  "parentID": "mig_cmo7ihtj36ti7njv1al0",
+  "checksum": "1:191113a2b19326de2ea5b6b163d27068b437b59752b2b035909c353e135c0847",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "accessControlEvent",
+          "type": "json"
+        },
+        "table": "hik_device_event"
+      }
+    }
+  ]
+}

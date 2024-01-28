@@ -3,6 +3,9 @@ import fs from "fs";
 import { z } from 'zod';
 import upload from "../lib/multer";
 import appLogger from "../lib/logger";
+import { getXataClient } from "../db/xata";
+const xata = getXataClient();
+
 const loggingConfig = {
     dir: "data/alarams",
 }
@@ -36,7 +39,7 @@ const EventSchema = z.object({
     eventType: z.string(),
     eventState: z.string(),
     eventDescription: z.string(),
-    channelName: z.string().optional(), 
+    channelName: z.string().optional(),
     AccessControllerEvent: AccessControllerEventSchema.optional()
 });
 
@@ -49,46 +52,46 @@ const attendanceWorkflowRouter = express.Router();
 function processAccessControllerEvent(event: GeneralEvent) {
     const alarmDetails = event.AccessControllerEvent;
     if (alarmDetails) {
-        console.log(alarmDetails);
+        //console.log(alarmDetails);
     } else {
         appLogger.error(`Received Alarm, but event is not correct`);
     }
 }
 
-function logMessage ( event: GeneralEvent ) { 
-    const directory = `${loggingConfig.dir}/${event.ipAddress}`;
-    
-    // Check if the directory exists
-    fs.access(directory, fs.constants.F_OK, (err) => {
-        if (err) {
-            // Directory doesn't exist, create it recursively
-            fs.mkdir(directory, { recursive: true }, (err) => {
-                if (err) {
-                    console.error(`Error creating directory: ${err}`);
-                } else {
-                    console.log(`Directory created: ${directory}`);
-                }
-            });
-        } else {
-            //console.log(`Directory already exists: ${directory}`);
-        }
+async function logMessage(event: GeneralEvent) {
+
+    const eventRecord = await xata.db.HikCameraEvent.create({
+        ipAddress: event.ipAddress,
+        portNo: event.portNo,
+        protocol: event.protocol,
+        macAddress: event.macAddress,
+        timestamp: new Date(event.dateTime),
+        state: event.eventState,
+        channelName: event.channelName,
+        channelId: event.channelID,
+        activePostCount: event.activePostCount,
     });
 
-    fs.writeFileSync ( `${directory}/${Date.now()}.json`, JSON.stringify(event, null, 2))
+    if ( event.AccessControllerEvent ) { 
+        const accessControlEventRecord = await xata.db.AccessControlEvent.create({
+            ... event.AccessControllerEvent,
+            relatedEvent: eventRecord.id,
+          });
+    }
 
 }
 
 function processMessage(event: GeneralEvent) {
-    
+
+    logMessage(event);
 
     if (event.eventType === "videoloss") {
-        appLogger.info("Just a video loss event from ${}");
+        appLogger.info(`Just a video loss event from [${event.ipAddress}]`);
         return;
     }
 
     if (event.eventType === "AccessControllerEvent") {
-        console.log("AccessControllerEvent Receieved")
-        logMessage ( event );
+        appLogger.info("AccessControllerEvent Recieved" + ` [${event.AccessControllerEvent?.subEventType}]`)
         processAccessControllerEvent(event);
         return;
     }
@@ -116,10 +119,20 @@ attendanceWorkflowRouter.post("/on-xml-event", (req: Request, res: Response) => 
 })
 
 attendanceWorkflowRouter.post("/on-image", upload.single("image"), (req: Request, res: Response) => {
-    const formdata = req.body;
-    const file = req.files;
-    console.log(formdata);
-    console.log(file);
+    const file = req.file;
+    const eventString = req.body.event;
+    
+    if ( file) {
+        //const fileBuffer = file.buffer;
+        //const fileBase64 = fileBuffer.toString('base64');
+        const json = JSON.parse(eventString) as GeneralEvent;
+        processMessage(json);
+    
+    } 
+
+
+
+
     res.send({
         success: true
     })

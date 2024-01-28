@@ -1,0 +1,16 @@
+{
+  "id": "mig_cmo7h9oj7ui57525crn0",
+  "parentID": "mig_cmo7h58j7ui57525crm0",
+  "checksum": "1:32375e607ffcd48ef9036dd34b68f8ec76cbf1a2661b5ad9a21324c304efeef0",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "portNo",
+          "type": "int"
+        },
+        "table": "hik_device_event"
+      }
+    }
+  ]
+}

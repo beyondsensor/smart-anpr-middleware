@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://BeyondSensor-Xata-Workspace-jpgu1o.ap-southeast-2.xata.sh/db/event-management-db",
+  "codegen": {
+    "output": "src/db/xata.ts"
+  }
+}

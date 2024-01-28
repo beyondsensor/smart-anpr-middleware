@@ -1,0 +1,14 @@
+{
+  "id": "mig_cmo7ie0j7ui57525crs0",
+  "parentID": "mig_cmo7ic8j7ui57525crr0",
+  "checksum": "1:e066240f99fb39f3d13b69517da992a27bf92092ddac0dbcc082f359373e715d",
+  "operations": [
+    {
+      "renameColumn": {
+        "newName": "state",
+        "oldName": "eventState",
+        "table": "hik_device_event"
+      }
+    }
+  ]
+}

@@ -4,18 +4,6 @@ import appLogger from "../lib/logger";
 import { AlarmMessage, makeHikIsapiPlugin } from "../plugins/hikvision/hik-isapi-plugin";
 import { makeWebhook } from "../plugins/webhook/web-hook-plugin";
 
-
-
-
-/*************************
- * 
- * 
- * 1. Listen for any incoming message from HikVision's FR Terminal 
- * 2. Connect to ISAPI Alarm Event 
- * 3. Filter the Messages, and then parse it to another System, via Webhook configured. 
- */
-
-
 const cameraConfig : HikIsapiPluginConfig = {
     id: "2",
     name: "Office Entrance FR Terminal", 
@@ -30,13 +18,16 @@ const cameraConfig : HikIsapiPluginConfig = {
 }
 
 const plugin = makeHikIsapiPlugin( cameraConfig );
+let lastRecord : any = undefined 
 function onAlertMessage ( message : AlarmMessage ) { 
     
     appLogger.info ( `Incoming message from Camera : [${message.contentLength}] [${message.contentType}]`);
 
     if ( message.contentType === "application/json" ) {
         const body = JSON.parse ( Buffer.from ( message.messageData ).toString() ); 
-        onJsonWebHook.invoke ( body );
+        /// Take the Last Record and Store it in memory. This is needed when we are trying to push Image Data 
+        lastRecord = body;         
+        //onJsonWebHook.invoke ( body );
     }
 
     if ( message.contentType === "application/xml") { 
@@ -44,9 +35,16 @@ function onAlertMessage ( message : AlarmMessage ) {
     }
 
     if ( message.contentType === "image/jpeg" ) { 
+
         const formData = new FormData(); 
         formData.append( "image", new Blob([new Uint8Array(message.messageData)]));
+
+        /// Set the Last Record Date into the Form Mix, so that we can relate the image from there. 
+        if ( lastRecord ) { 
+            formData.set("event", JSON.stringify(lastRecord))
+        }
         onImageWebHook.invoke ( formData );
+        lastRecord = undefined; 
     }
 }
 plugin.getAlertStream ( onAlertMessage )
