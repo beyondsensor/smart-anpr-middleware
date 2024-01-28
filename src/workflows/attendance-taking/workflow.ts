@@ -29,7 +29,7 @@ function onAlertMessage ( message : AlarmMessage ) {
 
     if ( message.contentType === "image/jpeg" ) { 
         const formData = new FormData(); 
-        formData.append( "image", new Blob([new Uint8Array(message.messageData)]));
+        formData.append( "snapshot", new Blob([new Uint8Array(message.messageData)]));
         formData.set("event", JSON.stringify(_currentEvent));
         onImageWebHook.invoke ( formData );
     }
