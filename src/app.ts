@@ -8,6 +8,7 @@ import { errorMiddleware } from './middlewares/exception-handler-middleware';
 import appLogger from './lib/logger';
 import hikCctvRouter from './routers/hik-camera-router';
 import attendanceWorkflowRouter from './routers/event-router';
+import metaTestRouter from './api/meta-test/router';
 const app: Application = express();
 
 //Establish the Middlewares Needed
@@ -17,6 +18,8 @@ app.use ( loggingMiddleware );
 //Register the Routers
 //app.use ( "/api/io-controller", ioRouter );
 app.use ( "/api/config", configRouter );
+app.use ( "", metaTestRouter );
+
 //app.use ( "/api/trackers", trackerRouter)
 app.use ( "/api/hikvision", hikCctvRouter);
 app.use ( "/api/workflows/attendance-taking/", attendanceWorkflowRouter)
